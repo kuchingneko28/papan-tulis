@@ -2,8 +2,6 @@
 
 A modern, mobile-first logistics tracking dashboard built with a single-file architecture. Designed for simplicity, speed, and offline reliability.
 
-![Demo](https://github.com/kuchingneko28/papan-tulis/assets/placeholder-image.png)
-
 ## ✨ Features
 
 - **📱 Mobile-First Design**: Responsive card-based layout that works perfectly on phones, tablets, and desktops.
