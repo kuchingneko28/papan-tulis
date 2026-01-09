@@ -158,23 +158,25 @@
             <!-- Time Grid -->
             <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-sm mb-4">
               <div>
-                <span class="text-xs text-ctp-overlay0 block">Mulai (Out)</span>
-                <span class="font-semibold text-ctp-text">
-                  <span x-text="formatDate(row.tgl_berangkat)"></span> • <span x-text="row.jam_berangkat"></span>
-                </span>
+                <span class="text-xs text-ctp-overlay0 block mb-1">Berangkat</span>
+                <div class="flex flex-col">
+                  <span class="font-bold text-ctp-text text-sm" x-text="formatDate(row.tgl_berangkat)"></span>
+                  <span class="text-xs text-ctp-subtext0" x-text="row.jam_berangkat"></span>
+                </div>
               </div>
               <div>
-                <span class="text-xs text-ctp-overlay0 block">Tiba (In)</span>
-                <span class="font-semibold text-ctp-text">
-                  <span x-text="formatDate(row.tgl_tiba)"></span> • <span x-text="row.jam_tiba"></span>
-                </span>
+                <span class="text-xs text-ctp-overlay0 block mb-1">Tiba (Gate In)</span>
+                <div class="flex flex-col">
+                  <span class="font-bold text-ctp-text text-sm" x-text="formatDate(row.tgl_tiba)"></span>
+                  <span class="text-xs text-ctp-subtext0" x-text="row.jam_tiba"></span>
+                </div>
               </div>
               <div>
                 <span class="text-xs text-ctp-overlay0 block">Bongkar</span>
                 <span class="font-semibold text-ctp-text" x-text="row.jam_bongkar || '-'"></span>
               </div>
               <div>
-                <span class="text-xs text-ctp-overlay0 block">Selesai</span>
+                <span class="text-xs text-ctp-overlay0 block">Selesai (Gate Out)</span>
                 <span class="font-semibold text-ctp-text" x-text="row.jam_selesai || '-'"></span>
               </div>
             </div>
@@ -234,11 +236,11 @@
               <th>NO</th>
               <th>PLAT</th>
               <th>TGL<br />BERANGKAT</th>
-              <th>JAM<br />OUT</th>
+              <th>JAM<br />BERANGKAT</th>
               <th>TGL<br />TIBA</th>
               <th>JAM<br />IN</th>
               <th>JAM<br />BONGKAR</th>
-              <th>JAM<br />SELESAI</th>
+              <th>JAM<br />OUT</th>
               <th>STATUS</th>
               <th>REMARKS</th>
             </tr>
@@ -288,7 +290,7 @@
                   type="text"
                   required
                   placeholder="B 1234 XX"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
               <div class="flex flex-col gap-1">
@@ -297,7 +299,7 @@
                   x-model="currentRow.status"
                   type="text"
                   placeholder="DONE / OTW"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
 
@@ -307,7 +309,7 @@
                 <input
                   x-model="currentRow.tgl_berangkat"
                   type="date"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
               <div class="flex flex-col gap-1">
@@ -315,7 +317,7 @@
                 <input
                   x-model="currentRow.jam_berangkat"
                   type="time"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
 
@@ -324,7 +326,7 @@
                 <input
                   x-model="currentRow.tgl_tiba"
                   type="date"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
               <div class="flex flex-col gap-1">
@@ -332,7 +334,7 @@
                 <input
                   x-model="currentRow.jam_tiba"
                   type="time"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
 
@@ -341,7 +343,7 @@
                 <input
                   x-model="currentRow.jam_bongkar"
                   type="time"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
               <div class="flex flex-col gap-1">
@@ -349,17 +351,27 @@
                 <input
                   x-model="currentRow.jam_selesai"
                   type="time"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
                 />
               </div>
 
               <div class="flex flex-col gap-1 md:col-span-2">
                 <label class="text-sm font-semibold text-ctp-overlay1">Remarks</label>
-                <input
+                <select
                   x-model="currentRow.remarks"
-                  type="text"
-                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-                />
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition appearance-none"
+                >
+                  <option value="" disabled>Select Vendor...</option>
+                  <optgroup label="STD">
+                    <option value="Lion Parcel">Lion Parcel</option>
+                    <option value="ESP">ESP</option>
+                    <option value="CKL">CKL</option>
+                    <option value="Avia">Avia</option>
+                  </optgroup>
+                  <optgroup label="DARAT">
+                    <option value="Eco">Eco</option>
+                  </optgroup>
+                </select>
               </div>
             </div>
             <div class="flex justify-end gap-3">
@@ -467,9 +479,7 @@
             if (!isoDate) return "-";
             const date = new Date(isoDate);
             if (isNaN(date.getTime())) return isoDate;
-            const day = String(date.getDate()).padStart(2, "0");
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            return `${day}/${month}`;
+            return date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
           },
 
           openModal() {
