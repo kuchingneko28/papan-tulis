@@ -267,115 +267,118 @@
     <!-- Modal (Tailwind) -->
     <div
       x-show="modalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity"
+      class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity"
       style="display: none"
       x-transition
     >
-      <div
-        class="bg-ctp-base border border-ctp-surface1 rounded-2xl shadow-2xl w-full max-w-lg p-8 mx-4"
-        @click.away="closeModal()"
-      >
-        <!-- Form content reuse -->
-        <h2 class="text-2xl font-bold text-ctp-blue mb-6" x-text="editMode ? 'Edit Row' : 'Add New Row'"></h2>
-        <form @submit.prevent="saveRow">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Plat / Nopol</label>
-              <input
-                x-model="currentRow.plat"
-                type="text"
-                required
-                placeholder="B 1234 XX"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Status</label>
-              <input
-                x-model="currentRow.status"
-                type="text"
-                placeholder="DONE / OTW"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
+      <!-- Scroll Wrapper -->
+      <div class="flex min-h-full items-center justify-center p-4 text-center">
+        <div
+          class="bg-ctp-base border border-ctp-surface1 rounded-2xl shadow-2xl w-full max-w-lg p-8 text-left relative"
+          @click.away="closeModal()"
+        >
+          <!-- Form content reuse -->
+          <h2 class="text-2xl font-bold text-ctp-blue mb-6" x-text="editMode ? 'Edit Row' : 'Add New Row'"></h2>
+          <form @submit.prevent="saveRow">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Plat / Nopol</label>
+                <input
+                  x-model="currentRow.plat"
+                  type="text"
+                  required
+                  placeholder="B 1234 XX"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Status</label>
+                <input
+                  x-model="currentRow.status"
+                  type="text"
+                  placeholder="DONE / OTW"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
 
-            <!-- Native Date Inputs -->
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Tgl Berangkat</label>
-              <input
-                x-model="currentRow.tgl_berangkat"
-                type="date"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Jam Berangkat</label>
-              <input
-                x-model="currentRow.jam_berangkat"
-                type="time"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
+              <!-- Native Date Inputs -->
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Tgl Berangkat</label>
+                <input
+                  x-model="currentRow.tgl_berangkat"
+                  type="date"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Jam Berangkat</label>
+                <input
+                  x-model="currentRow.jam_berangkat"
+                  type="time"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
 
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Tgl Tiba</label>
-              <input
-                x-model="currentRow.tgl_tiba"
-                type="date"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Jam Tiba</label>
-              <input
-                x-model="currentRow.jam_tiba"
-                type="time"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Tgl Tiba</label>
+                <input
+                  x-model="currentRow.tgl_tiba"
+                  type="date"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Jam Tiba</label>
+                <input
+                  x-model="currentRow.jam_tiba"
+                  type="time"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
 
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Jam Bongkar</label>
-              <input
-                x-model="currentRow.jam_bongkar"
-                type="time"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-sm font-semibold text-ctp-overlay1">Jam Selesai</label>
-              <input
-                x-model="currentRow.jam_selesai"
-                type="time"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
-            </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Jam Bongkar</label>
+                <input
+                  x-model="currentRow.jam_bongkar"
+                  type="time"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-sm font-semibold text-ctp-overlay1">Jam Selesai</label>
+                <input
+                  x-model="currentRow.jam_selesai"
+                  type="time"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
 
-            <div class="flex flex-col gap-1 md:col-span-2">
-              <label class="text-sm font-semibold text-ctp-overlay1">Remarks</label>
-              <input
-                x-model="currentRow.remarks"
-                type="text"
-                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
-              />
+              <div class="flex flex-col gap-1 md:col-span-2">
+                <label class="text-sm font-semibold text-ctp-overlay1">Remarks</label>
+                <input
+                  x-model="currentRow.remarks"
+                  type="text"
+                  class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                />
+              </div>
             </div>
-          </div>
-          <div class="flex justify-end gap-3">
-            <button
-              type="button"
-              @click="closeModal()"
-              class="px-5 py-2.5 rounded-xl font-semibold text-ctp-red hover:bg-ctp-red/10 transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="px-5 py-2.5 rounded-xl font-semibold bg-ctp-green text-ctp-base hover:bg-ctp-teal transition shadow-md"
-            >
-              Save Changes
-            </button>
-          </div>
-        </form>
+            <div class="flex justify-end gap-3">
+              <button
+                type="button"
+                @click="closeModal()"
+                class="px-5 py-2.5 rounded-xl font-semibold text-ctp-red hover:bg-ctp-red/10 transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="px-5 py-2.5 rounded-xl font-semibold bg-ctp-green text-ctp-base hover:bg-ctp-teal transition shadow-md"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
