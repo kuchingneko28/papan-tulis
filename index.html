@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Papan Tulis</title>
+    <!-- Google Fonts: Kalam for that marker look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS (CDN for quick setup) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["'Plus Jakarta Sans'", "sans-serif"],
+              hand: ["'Kalam'", "cursive"],
+            },
+            colors: {
+              ctp: {
+                base: "rgb(var(--ctp-base) / <alpha-value>)",
+                surface0: "rgb(var(--ctp-surface0) / <alpha-value>)",
+                surface1: "rgb(var(--ctp-surface1) / <alpha-value>)",
+                surface2: "rgb(var(--ctp-surface2) / <alpha-value>)",
+                overlay0: "rgb(var(--ctp-overlay0) / <alpha-value>)",
+                overlay1: "rgb(var(--ctp-overlay1) / <alpha-value>)",
+                overlay2: "rgb(var(--ctp-overlay2) / <alpha-value>)",
+                text: "rgb(var(--ctp-text) / <alpha-value>)",
+                subtext0: "rgb(var(--ctp-subtext0) / <alpha-value>)",
+                subtext1: "rgb(var(--ctp-subtext1) / <alpha-value>)",
+                blue: "rgb(var(--ctp-blue) / <alpha-value>)",
+                mauve: "rgb(var(--ctp-mauve) / <alpha-value>)",
+                red: "rgb(var(--ctp-red) / <alpha-value>)",
+                green: "rgb(var(--ctp-green) / <alpha-value>)",
+                yellow: "rgb(var(--ctp-yellow) / <alpha-value>)",
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <!-- html2canvas for export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-ctp-base text-ctp-text font-sans p-4 md:p-8 transition-colors duration-300"
+    x-data="whiteboard"
+    :class="{ 'light': !isDark }"
+    x-cloak
+  >
+    <!-- Unified Header (Sticky) -->
+    <div
+      class="fixed top-0 left-0 right-0 bg-ctp-surface0/95 backdrop-blur-md border-b border-ctp-surface1 z-40 px-4 md:px-8 py-4 shadow-sm no-print transition-colors duration-300"
+    >
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        <!-- Title/Logo -->
+        <div class="flex items-center gap-3">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-ctp-blue to-ctp-mauve rounded-xl flex items-center justify-center text-ctp-base font-bold text-xl shadow-lg"
+          >
+            <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+          </div>
+          <h1 class="text-xl md:text-2xl font-extrabold text-ctp-text tracking-tight uppercase">
+            PAPAN <span class="text-ctp-blue">TULIS</span>
+          </h1>
+        </div>
+
+        <!-- Secondary Actions (Icon Buttons) -->
+        <div class="flex items-center gap-3">
+          <!-- Theme Toggle -->
+          <button
+            @click="toggleTheme()"
+            class="p-2.5 rounded-xl bg-ctp-surface1 text-ctp-text border border-ctp-surface2 hover:bg-ctp-surface2 hover:text-ctp-blue transition active:scale-95"
+            :title="isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+          >
+            <i :data-lucide="isDark ? 'sun' : 'moon'" class="w-5 h-5"></i>
+          </button>
+
+          <div class="w-px h-8 bg-ctp-surface2 mx-1"></div>
+
+          <button
+            @click="exportBoard()"
+            title="Export to JPG"
+            class="p-2.5 rounded-xl bg-ctp-surface1 text-ctp-text border border-ctp-surface2 hover:bg-ctp-surface2 hover:text-ctp-blue transition active:scale-95"
+          >
+            <i data-lucide="camera" class="w-5 h-5"></i>
+          </button>
+          <button
+            @click="clearBoard()"
+            title="Clear All"
+            class="p-2.5 rounded-xl bg-ctp-surface1 text-ctp-text border border-ctp-surface2 hover:bg-ctp-surface2 hover:text-ctp-red transition active:scale-95"
+          >
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content (Padding for Header) -->
+    <div id="whiteboard" class="max-w-7xl mx-auto p-4 md:p-0 mt-24 pb-24">
+      <!-- Mobile-First Card Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <template x-for="(row, index) in rows" :key="row.id">
+          <div
+            class="bg-ctp-surface0 border border-ctp-surface1 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:border-ctp-blue/50 transition-all duration-300 group"
+          >
+            <!-- Header: Number, Plat & Status -->
+            <div class="flex justify-between items-start mb-4 border-b border-ctp-surface1 pb-4">
+              <div class="flex items-center gap-4">
+                <!-- integrated Number Badge (Blue Accent) -->
+                <div
+                  class="w-8 h-8 rounded-lg bg-ctp-blue/10 text-ctp-blue flex items-center justify-center font-bold font-mono text-sm border border-ctp-blue/20 shadow-inner group-hover:scale-110 group-hover:bg-ctp-blue/20 transition-all duration-300"
+                  x-text="index + 1"
+                ></div>
+
+                <div>
+                  <span
+                    class="text-[10px] font-bold text-ctp-overlay1 uppercase tracking-widest mb-0.5 block group-hover:text-ctp-blue/70 transition-colors"
+                    >Plat / Nopol</span
+                  >
+                  <div
+                    x-text="row.plat"
+                    class="text-2xl font-bold text-ctp-text font-mono leading-none tracking-tight"
+                  ></div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span
+                  x-text="row.status"
+                  class="px-3 py-1 rounded-full text-xs font-bold inline-block"
+                  :class="{
+                                    'bg-ctp-green/20 text-ctp-green': (row.status || '').toLowerCase().includes('done'),
+                                    'bg-ctp-red/20 text-ctp-red': (row.status || '').toLowerCase().includes('delay'),
+                                    'bg-ctp-yellow/20 text-ctp-yellow': (row.status || '').toLowerCase().includes('otw'),
+                                    'bg-ctp-surface1 text-ctp-subtext0': !['done','delay','otw'].some(s => (row.status || '').toLowerCase().includes(s))
+                                  }"
+                >
+                </span>
+              </div>
+            </div>
+
+            <!-- Time Grid -->
+            <div class="grid grid-cols-2 gap-y-4 gap-x-2 text-sm mb-4">
+              <div>
+                <span class="text-xs text-ctp-overlay0 block">Mulai (Out)</span>
+                <span class="font-semibold text-ctp-text">
+                  <span x-text="formatDate(row.tgl_berangkat)"></span> • <span x-text="row.jam_berangkat"></span>
+                </span>
+              </div>
+              <div>
+                <span class="text-xs text-ctp-overlay0 block">Tiba (In)</span>
+                <span class="font-semibold text-ctp-text">
+                  <span x-text="formatDate(row.tgl_tiba)"></span> • <span x-text="row.jam_tiba"></span>
+                </span>
+              </div>
+              <div>
+                <span class="text-xs text-ctp-overlay0 block">Bongkar</span>
+                <span class="font-semibold text-ctp-text" x-text="row.jam_bongkar || '-'"></span>
+              </div>
+              <div>
+                <span class="text-xs text-ctp-overlay0 block">Selesai</span>
+                <span class="font-semibold text-ctp-text" x-text="row.jam_selesai || '-'"></span>
+              </div>
+            </div>
+
+            <!-- Footer: Remarks & Actions -->
+            <div class="flex justify-between items-end mt-2 pt-4 border-t border-ctp-surface1/50">
+              <div class="flex-1 mr-4">
+                <div class="text-xs text-ctp-overlay0 mb-1">Remarks</div>
+                <div x-text="row.remarks" class="text-sm text-ctp-subtext1 italic truncate"></div>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  @click="editRow(row.id)"
+                  class="p-2 rounded-lg bg-ctp-blue/10 text-ctp-blue hover:bg-ctp-blue/20 transition"
+                >
+                  <i data-lucide="pencil" class="w-4 h-4"></i>
+                </button>
+                <button
+                  @click="deleteRow(row.id)"
+                  class="p-2 rounded-lg bg-ctp-red/10 text-ctp-red hover:bg-ctp-red/20 transition"
+                >
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Empty State -->
+        <template x-if="rows.length === 0">
+          <div
+            class="col-span-full py-16 text-center text-ctp-overlay1 border-2 border-dashed border-ctp-surface1 rounded-2xl"
+          >
+            No data found. Click "+ Add Row" to start.
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- Floating Action Button (FAB) -->
+    <button
+      @click="openModal()"
+      class="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-14 h-14 bg-gradient-to-tr from-ctp-blue to-ctp-mauve text-ctp-base rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-90 transition duration-300 z-50 group no-print"
+    >
+      <i data-lucide="plus" class="w-8 h-8 group-hover:rotate-90 transition duration-300"></i>
+    </button>
+
+    <!-- HIDDEN EXPORT TEMPLATE (The Original Whiteboard Table) -->
+    <!-- This is invisible but updated by Alpine, used ONLY for html2canvas -->
+    <div id="export-template" class="hidden">
+      <!-- The printing-mode class here is crucial, it triggers all the CSS in style.css -->
+      <div class="printing-mode">
+        <h1 class="board-title">PAPAN TULIS</h1>
+        <table class="whiteboard-table">
+          <thead>
+            <tr>
+              <th>NO</th>
+              <th>PLAT</th>
+              <th>TGL<br />BERANGKAT</th>
+              <th>JAM<br />OUT</th>
+              <th>TGL<br />TIBA</th>
+              <th>JAM<br />IN</th>
+              <th>JAM<br />BONGKAR</th>
+              <th>JAM<br />SELESAI</th>
+              <th>STATUS</th>
+              <th>REMARKS</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="(row, index) in rows" :key="row.id">
+              <tr>
+                <td x-text="index + 1" class="text-center"></td>
+                <td x-text="row.plat"></td>
+                <td x-text="formatDate(row.tgl_berangkat)"></td>
+                <td x-text="row.jam_berangkat"></td>
+                <td x-text="formatDate(row.tgl_tiba)"></td>
+                <td x-text="row.jam_tiba"></td>
+                <td x-text="row.jam_bongkar"></td>
+                <td x-text="row.jam_selesai"></td>
+                <td class="text-center"><span x-text="row.status"></span></td>
+                <td x-text="row.remarks" style="word-wrap: break-word"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+        <div class="timestamp-overlay" x-text="currentTimestamp"></div>
+      </div>
+    </div>
+
+    <!-- Modal (Tailwind) -->
+    <div
+      x-show="modalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-opacity"
+      style="display: none"
+      x-transition
+    >
+      <div
+        class="bg-ctp-base border border-ctp-surface1 rounded-2xl shadow-2xl w-full max-w-lg p-8 mx-4"
+        @click.away="closeModal()"
+      >
+        <!-- Form content reuse -->
+        <h2 class="text-2xl font-bold text-ctp-blue mb-6" x-text="editMode ? 'Edit Row' : 'Add New Row'"></h2>
+        <form @submit.prevent="saveRow">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Plat / Nopol</label>
+              <input
+                x-model="currentRow.plat"
+                type="text"
+                required
+                placeholder="B 1234 XX"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Status</label>
+              <input
+                x-model="currentRow.status"
+                type="text"
+                placeholder="DONE / OTW"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+
+            <!-- Native Date Inputs -->
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Tgl Berangkat</label>
+              <input
+                x-model="currentRow.tgl_berangkat"
+                type="date"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Jam Berangkat</label>
+              <input
+                x-model="currentRow.jam_berangkat"
+                type="time"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Tgl Tiba</label>
+              <input
+                x-model="currentRow.tgl_tiba"
+                type="date"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Jam Tiba</label>
+              <input
+                x-model="currentRow.jam_tiba"
+                type="time"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Jam Bongkar</label>
+              <input
+                x-model="currentRow.jam_bongkar"
+                type="time"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-semibold text-ctp-overlay1">Jam Selesai</label>
+              <input
+                x-model="currentRow.jam_selesai"
+                type="time"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1 md:col-span-2">
+              <label class="text-sm font-semibold text-ctp-overlay1">Remarks</label>
+              <input
+                x-model="currentRow.remarks"
+                type="text"
+                class="bg-ctp-surface0 border border-ctp-surface1 rounded-lg px-4 py-2 text-sm text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+              />
+            </div>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button
+              type="button"
+              @click="closeModal()"
+              class="px-5 py-2.5 rounded-xl font-semibold text-ctp-red hover:bg-ctp-red/10 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2.5 rounded-xl font-semibold bg-ctp-green text-ctp-base hover:bg-ctp-teal transition shadow-md"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("alpine:init", () => {
+        Alpine.data("whiteboard", () => ({
+          rows: [],
+          modalOpen: false,
+          editMode: false,
+          currentRow: {},
+          currentTimestamp: new Date().toLocaleString(),
+
+          isDark: JSON.parse(localStorage.getItem("isDark")) ?? true,
+
+          init() {
+            // Initialize Lucide Icons
+            this.$nextTick(() => {
+              lucide.createIcons();
+            });
+
+            // Re-run icon creation when DOM likely updates
+            this.$watch("rows", () => {
+              this.$nextTick(() => lucide.createIcons());
+            });
+
+            // Watch theme changes
+            this.$watch("isDark", (value) => {
+              localStorage.setItem("isDark", value);
+              // Re-render icons after theme switch
+              this.$nextTick(() => lucide.createIcons());
+            });
+
+            // Set initial timestamp
+            this.updateTimestamp();
+            // Update timestamp every minute
+            setInterval(() => {
+              this.updateTimestamp();
+            }, 60000);
+
+            // Load from LocalStorage
+            try {
+              const saved = localStorage.getItem("whiteboard_data");
+              if (saved) {
+                this.rows = JSON.parse(saved);
+              } else {
+                throw new Error("No saved data");
+              }
+            } catch (error) {
+              console.warn("Could not load data:", error);
+              // Default Dummy Data
+              this.rows = [
+                {
+                  id: 1,
+                  plat: "B 9736 PXR",
+                  tgl_berangkat: "2026-01-08",
+                  jam_berangkat: "17:00",
+                  tgl_tiba: "2026-01-09",
+                  jam_tiba: "18:25",
+                  jam_bongkar: "19:25",
+                  jam_selesai: "20:23",
+                  status: "DONE",
+                  remarks: "Eco",
+                },
+              ];
+            }
+          },
+
+          updateTimestamp() {
+            this.currentTimestamp = new Date().toLocaleString("en-US", {
+              timeZone: "Asia/Singapore", // GMT+8
+              year: "numeric",
+              month: "numeric",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              second: "numeric",
+              hour12: true,
+            });
+          },
+
+          toggleTheme() {
+            this.isDark = !this.isDark;
+          },
+
+          formatDate(isoDate) {
+            if (!isoDate) return "-";
+            const date = new Date(isoDate);
+            if (isNaN(date.getTime())) return isoDate;
+            const day = String(date.getDate()).padStart(2, "0");
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            return `${day}/${month}`;
+          },
+
+          openModal() {
+            this.currentRow = {
+              id: Date.now(),
+              plat: "",
+              tgl_berangkat: "",
+              jam_berangkat: "",
+              tgl_tiba: "",
+              jam_tiba: "",
+              jam_bongkar: "",
+              jam_selesai: "",
+              status: "",
+              remarks: "",
+            };
+            this.editMode = false;
+            this.modalOpen = true;
+          },
+
+          editRow(id) {
+            const row = this.rows.find((r) => r.id === id);
+            if (row) {
+              this.currentRow = { ...row };
+              this.editMode = true;
+              this.modalOpen = true;
+            }
+          },
+
+          saveRow() {
+            if (this.editMode) {
+              const index = this.rows.findIndex((r) => r.id === this.currentRow.id);
+              if (index !== -1) {
+                this.rows[index] = { ...this.currentRow }; // Copy object
+              }
+            } else {
+              this.rows.push({ ...this.currentRow }); // Copy object
+            }
+            this.saveData(); // Explicit save
+            this.closeModal();
+          },
+
+          deleteRow(id) {
+            if (confirm("Are you sure you want to delete this row?")) {
+              this.rows = this.rows.filter((r) => r.id !== id);
+              this.saveData(); // Explicit save
+            }
+          },
+
+          closeModal() {
+            this.modalOpen = false;
+            this.currentRow = {};
+          },
+
+          clearBoard() {
+            if (confirm("Warning: This will delete ALL rows. Are you sure?")) {
+              this.rows = [];
+              localStorage.removeItem("whiteboard_data");
+            }
+          },
+
+          saveData() {
+            localStorage.setItem("whiteboard_data", JSON.stringify(this.rows));
+          },
+
+          exportBoard() {
+            // CLONE THE HIDDEN TEMPLATE, not the dashboard
+            const template = document.getElementById("export-template").firstElementChild;
+            const clonedBoard = template.cloneNode(true);
+
+            // Style the clone to be visible for capture, but off-screen
+            clonedBoard.classList.add("printing-mode");
+            clonedBoard.style.position = "absolute";
+            clonedBoard.style.top = "-9999px";
+            clonedBoard.style.left = "0";
+            // Important: Width must be set to ensure table renders correctly
+            clonedBoard.style.width = "1400px";
+            clonedBoard.style.display = "block"; // Make sure it's not hidden
+
+            // Append to body so html2canvas can read it
+            document.body.appendChild(clonedBoard);
+
+            // Capture the CLONE
+            html2canvas(clonedBoard, {
+              scale: 2,
+              backgroundColor: "#ffffff",
+              // No need to ignore elements since the template is clean
+            }).then((canvas) => {
+              const now = new Date();
+              const datePart = now.toLocaleDateString("en-GB").split("/").reverse().join("-"); // YYYY-MM-DD
+              const timePart = now.toLocaleTimeString("en-GB", { hour12: false }).replace(/:/g, "."); // HH.MM.SS
+              const filename = `Papan-Tulis_${datePart}_${timePart}.jpg`;
+
+              const link = document.createElement("a");
+              link.download = filename;
+              link.href = canvas.toDataURL("image/jpeg", 1.0);
+              link.click();
+
+              // Clean up
+              document.body.removeChild(clonedBoard);
+            });
+          },
+        }));
+      });
+    </script>
+  </body>
+</html>

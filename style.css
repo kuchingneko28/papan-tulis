@@ -1,0 +1,160 @@
+/*
+  style.css - NOW ONLY USED FOR PRINTING/EXPORT LOGIC
+  The dashboard UI is fully handled by Tailwind classes in index.html.
+*/
+
+/* --- EXPORT MODE (The Whiteboard Document) --- */
+.printing-mode {
+  background-color: #ffffff !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #000000 !important;
+  border-radius: 0 !important;
+  padding: 30px 60px 60px 60px !important; /* Reduced top padding further */
+  margin: 0 !important;
+  width: 1400px !important; /* Fixed rendering width */
+  height: auto !important;
+  box-sizing: border-box !important;
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  position: relative !important;
+}
+
+/* Force Header to be Document Style */
+.printing-mode .board-title {
+  color: #000000 !important;
+  border-bottom: 3px solid #000000 !important; /* Thicker header line */
+  font-size: 2.2rem !important;
+  font-weight: 800 !important;
+  margin-bottom: 25px !important; /* Reduced gap */
+  padding-bottom: 10px !important;
+  text-align: center !important;
+  display: block !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Re-enable Grid for Export */
+.printing-mode .whiteboard-table {
+  border: 2px solid #000000 !important;
+  width: 100% !important;
+  border-collapse: collapse !important;
+  table-layout: fixed !important; /* Ensure consistent column widths if defined, or just stable layout */
+}
+
+.printing-mode .whiteboard-table th {
+  color: #000000 !important;
+  border: 1px solid #000000 !important;
+  background: #f3f4f6 !important; /* Light gray header */
+  font-weight: 800 !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  padding: 12px 8px !important; /* Balanced padding */
+  font-size: 0.85rem !important;
+  vertical-align: middle !important;
+  line-height: 1.2 !important; /* Tighten line height to prevent top gap */
+}
+
+.printing-mode .whiteboard-table td {
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+  font-size: 1rem !important;
+  padding: 12px 10px !important; /* Consistent cell padding */
+  vertical-align: middle !important;
+  line-height: 1.4 !important;
+}
+
+/* Specific Column Widths (Optional but helps consistency) */
+.printing-mode .whiteboard-table th:nth-child(1) {
+  width: 50px !important;
+} /* NO */
+.printing-mode .whiteboard-table th:nth-child(2) {
+  width: 140px !important;
+} /* PLAT */
+/* Add more if needed, but auto layout usually works for equal grids */
+
+/* Reset badges to plain text for export */
+.printing-mode .whiteboard-table td span {
+  background: transparent !important;
+  color: #000000 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-weight: bold !important;
+  display: inline !important;
+  text-transform: uppercase !important;
+}
+
+/* Hide Actions Column in Print */
+.printing-mode .no-print {
+  display: none !important;
+}
+
+/* Timestamp logic */
+.printing-mode .timestamp-overlay {
+  display: block !important;
+  color: #000000 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin-top: 40px !important;
+  text-align: right !important;
+  border-top: 1px solid #000000 !important; /* Black line for footer */
+  padding-top: 15px !important;
+}
+
+/* --- GLOBAL THEME VARIABLES & RESETS --- */
+
+/* Keeping minimal overrides for specific components */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Make native date inputs look decent in dark mode */
+input[type="date"],
+input[type="time"] {
+  color-scheme: dark;
+}
+
+/*
+  * CSS Variables for Theming (RGB Triplets for Tailwind Opacity Support)
+  * Default (:root) is Dark (Mocha)
+  * .light class is Light (Latte)
+  */
+:root {
+  --ctp-base: 30 30 46; /* #1e1e2e */
+  --ctp-surface0: 49 50 68; /* #313244 */
+  --ctp-surface1: 69 71 90; /* #45475a */
+  --ctp-surface2: 88 91 112; /* #585b70 */
+  --ctp-overlay0: 108 112 134; /* #6c7086 */
+  --ctp-overlay1: 127 132 156; /* #7f849c */
+  --ctp-overlay2: 147 153 178; /* #9399b2 */
+  --ctp-text: 205 214 244; /* #cdd6f4 */
+  --ctp-subtext0: 166 173 200; /* #a6adc8 */
+  --ctp-subtext1: 186 194 222; /* #bac2de */
+  --ctp-blue: 137 180 250; /* #89b4fa */
+  --ctp-mauve: 203 166 247; /* #cba6f7 */
+  --ctp-red: 243 139 168; /* #f38ba8 */
+  --ctp-green: 166 227 161; /* #a6e3a1 */
+  --ctp-yellow: 249 226 175; /* #f9e2af */
+}
+
+.light {
+  --ctp-base: 239 241 245; /* #eff1f5 */
+  --ctp-surface0: 255 255 255; /* #ffffff */
+  --ctp-surface1: 204 208 218; /* #ccd0da */
+  --ctp-surface2: 172 176 190; /* #acb0be */
+  --ctp-overlay0: 156 160 176; /* #9ca0b0 */
+  --ctp-overlay1: 140 143 161; /* #8c8fa1 */
+  --ctp-overlay2: 124 127 147; /* #7c7f93 */
+  --ctp-text: 76 79 105; /* #4c4f69 */
+  --ctp-subtext0: 108 111 133; /* #6c6f85 */
+  --ctp-subtext1: 92 95 119; /* #5c5f77 */
+  --ctp-blue: 30 102 245; /* #1e66f5 */
+  --ctp-mauve: 136 57 239; /* #8839ef */
+  --ctp-red: 210 15 57; /* #d20f39 */
+  --ctp-green: 64 160 43; /* #40a02b */
+  --ctp-yellow: 223 142 29; /* #df8e1d */
+}
+
+/* Native inputs in light mode need to adjust */
+.light input[type="date"],
+.light input[type="time"] {
+  color-scheme: light;
+}
