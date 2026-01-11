@@ -1,41 +1,44 @@
-# 📋 Papan Tulis (Logistics Board)
+# 📋 Papan Tulis V5 (Cloud Edition)
 
-A modern, mobile-first logistics tracking dashboard built with a single-file architecture. Designed for simplicity, speed, and offline reliability.
+A modern, cloud-synced logistics dashboard built for speed and reliability. Now powered by **Supabase Real-time**.
 
-## ✨ Features
+## ✨ What's New in V5?
 
-- **📱 Mobile-First Design**: Responsive card-based layout that works perfectly on phones, tablets, and desktops.
-- **🌗 Dark/Light Mode**: Full theme support with a convenient toggle switch.
-- **💾 Auto-Save**: Your data is automatically saved to LocalStorage, ensuring no data loss on refresh or close.
-- **📸 1-Click Export**: Generates a professional, formatted JPG report (1400px width) ready for sharing (WhatsApp/Email).
-- **⏱️ Real-Time & Statuses**:
-  - Live clock (GMT+8 Singapore/WITA timezone).
-  - Smart status tags (Green for DONE, Red for DELAY, etc.).
-  - Automatic timestamps for new entries.
+- **☁️ Cloud Sync**: Data is stored securely in the cloud, not just on your device.
+- **⚡ Real-Time Collaboration**: Updates (Add/Edit/Delete) appear instantly on all connected devices.
+- **📜 History & Archiving**: soft-delete system keeps your dashboard clean while preserving audit logs.
+- **� Interactive UI**: Toast notifications, loading spinners, and premium visual feedback.
+
+## 🚀 Key Features
+
+- **📱 Mobile-First**: Optimized for phones and tablets (Gateway Staff).
+- **🌗 Dark/Light Mode**: Full theme support (Mocha/Latte).
+- **📸 professional Export**: Generates a clean B&W JPG report for managers/WhatsApp.
+- **⏱️ Smart Automation**:
+  - Auto-formatting for Plate Numbers (`b1234xx` -> `B 1234 XX`).
+  - Auto-sorting by Arrival Time.
+  - "Smart Status" logic (Waiting -> Process -> Done).
 
 ## 🛠️ Technology Stack
 
-Built with a "No-Build" philosophy for maximum portability:
-
-- **HTML5**: Semantic structure.
-- **Tailwind CSS (CDN)**: Utility-first styling with custom RGB theme variables for transparency effects.
-- **Alpine.js**: Lightweight reactivity and state management.
-- **Lucide Icons**: Beautiful, consistent iconography.
-- **html2canvas**: Client-side image generation for exports.
+- **Frontend**: Alpine.js + Tailwind CSS (Single File Architecture).
+- **Backend**: Supabase (PostgreSQL + Realtime).
+- **Icons**: Lucide Icons.
+- **Export**: html2canvas.
 
 ## 🚀 How to Use
 
-No installation required!
-
-1.  **Download** the repository.
-2.  Open `index.html` in any modern browser.
-3.  Start tracking!
+1.  Open `index.html` in any browser.
+2.  **Add Truck**: Click the (+) Floating Button.
+3.  **Manage**: Edit details, set statuses, or delete (move to archive).
+4.  **Export**: Click the Camera icon for a daily report.
 
 ## 📂 Project Structure
 
-- `index.html`: Contains 99% of the app (UI, Logic, Dependencies).
-- `style.css`: Contains specialized styles _only_ for the generated image export layout (`.printing-mode`).
+- `index.html`: The entire application logic and UI.
+- `init_db.sql`: Database schema and security policies for Supabase.
+- `style.css`: Print-specific styles for the JPG export.
 
 ## 📝 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License.

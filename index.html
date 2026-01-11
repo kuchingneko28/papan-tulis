@@ -64,6 +64,64 @@
     :class="{ 'light': !isDark }"
     x-cloak
   >
+    <!-- TOAST CONTAINER -->
+    <div class="fixed bottom-6 right-6 z-[9999] flex flex-col-reverse gap-3 pointer-events-none">
+      <template x-for="toast in toasts" :key="toast.id">
+        <div
+          class="pl-3 pr-5 py-3 rounded-2xl shadow-xl transform transition-all duration-300 pointer-events-auto flex items-center gap-3 min-w-[300px] border border-white/20 backdrop-blur-md"
+          :class="{
+             'bg-ctp-green text-ctp-base': toast.type === 'success',
+             'bg-ctp-red text-ctp-base': toast.type === 'error'
+           }"
+          x-transition:enter="translate-x-full opacity-0 scale-95"
+          x-transition:enter-end="translate-x-0 opacity-100 scale-100"
+          x-transition:leave="translate-x-full opacity-0 scale-95"
+        >
+          <!-- Icon Wrapper -->
+          <div class="p-1.5 rounded-full bg-white/20 flex-shrink-0">
+            <!-- Success Icon -->
+            <svg
+              x-show="toast.type === 'success'"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            <!-- Error Icon -->
+            <svg
+              x-show="toast.type === 'error'"
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-5 h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="m15 9-6 6" />
+              <path d="m9 9 6 6" />
+            </svg>
+          </div>
+
+          <div class="flex flex-col">
+            <span
+              x-text="toast.type === 'success' ? 'Sukses!' : 'Oops!'"
+              class="text-[10px] font-black opacity-60 uppercase tracking-wider leading-none mb-0.5"
+            ></span>
+            <span x-text="toast.message" class="text-sm font-bold leading-tight"></span>
+          </div>
+        </div>
+      </template>
+    </div>
+
     <!-- Unified Header (Sticky) -->
     <div
       class="fixed top-0 left-0 right-0 bg-ctp-surface0/95 backdrop-blur-md border-b border-ctp-surface1 z-40 px-4 md:px-8 py-4 shadow-sm no-print transition-colors duration-300"
@@ -92,6 +150,15 @@
             <i :data-lucide="isDark ? 'sun' : 'moon'" class="w-5 h-5"></i>
           </button>
 
+          <!-- History Button -->
+          <button
+            @click="historyOpen = true; fetchHistory()"
+            class="p-2.5 rounded-xl bg-ctp-surface1 text-ctp-text border border-ctp-surface2 hover:bg-ctp-surface2 hover:text-ctp-mauve transition active:scale-95"
+            title="History / Arsip"
+          >
+            <i data-lucide="history" class="w-5 h-5"></i>
+          </button>
+
           <div class="w-px h-8 bg-ctp-surface2 mx-1"></div>
 
           <button
@@ -116,6 +183,14 @@
     <div id="whiteboard" class="max-w-7xl mx-auto p-4 md:p-0 mt-24 pb-24">
       <!-- Mobile-First Card Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Loading State -->
+        <template x-if="loading">
+          <div class="col-span-full py-20 flex flex-col items-center justify-center text-ctp-overlay1">
+            <i data-lucide="loader-2" class="w-10 h-10 animate-spin mb-4 text-ctp-blue"></i>
+            <p class="font-bold">Memuat Data...</p>
+          </div>
+        </template>
+
         <template x-for="(row, index) in rows" :key="row.id">
           <div
             class="bg-ctp-surface0 border border-ctp-surface1 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:border-ctp-blue/50 transition-all duration-300 group"
@@ -125,8 +200,8 @@
               <div class="flex items-center gap-4">
                 <!-- integrated Number Badge (Blue Accent) -->
                 <div
-                  class="w-8 h-8 rounded-lg bg-ctp-blue/10 text-ctp-blue flex items-center justify-center font-bold font-mono text-sm border border-ctp-blue/20 shadow-inner group-hover:scale-110 group-hover:bg-ctp-blue/20 transition-all duration-300"
-                  x-text="index + 1"
+                  class="w-10 h-10 rounded-lg bg-ctp-blue/10 text-ctp-blue flex items-center justify-center font-bold font-mono text-sm border border-ctp-blue/20 shadow-inner group-hover:scale-110 group-hover:bg-ctp-blue/20 transition-all duration-300"
+                  x-text="row.id"
                 ></div>
 
                 <div>
@@ -136,7 +211,7 @@
                   >
                   <div
                     x-text="row.plat"
-                    class="text-2xl font-bold text-ctp-text font-mono leading-none tracking-tight"
+                    class="text-xl md:text-2xl font-bold text-ctp-text font-mono leading-none tracking-tight"
                   ></div>
                 </div>
               </div>
@@ -145,11 +220,11 @@
                   x-text="translateStatus(row.status)"
                   class="px-3 py-1 rounded-full text-xs font-bold inline-block"
                   :class="{
-                                    'bg-ctp-green/20 text-ctp-green': (row.status || '').toLowerCase().includes('done'),
-                                    'bg-ctp-red/20 text-ctp-red': (row.status || '').toLowerCase().includes('delay'),
-                                    'bg-ctp-blue/20 text-ctp-blue': (row.status || '').toLowerCase().includes('waiting'),
-                                    'bg-ctp-yellow/20 text-ctp-yellow': (row.status || '').toLowerCase().includes('process'),
-                                    'bg-ctp-surface1 text-ctp-subtext0': !['done','delay','waiting','process'].some(s => (row.status || '').toLowerCase().includes(s))
+                                    'bg-ctp-green/10 text-ctp-green ring-1 ring-inset ring-ctp-green/20': (row.status || '').toLowerCase().includes('done'),
+                                    'bg-ctp-red/10 text-ctp-red ring-1 ring-inset ring-ctp-red/20': (row.status || '').toLowerCase().includes('delay'),
+                                    'bg-ctp-blue/10 text-ctp-blue ring-1 ring-inset ring-ctp-blue/20': (row.status || '').toLowerCase().includes('waiting'),
+                                    'bg-ctp-yellow/10 text-ctp-yellow ring-1 ring-inset ring-ctp-yellow/20': (row.status || '').toLowerCase().includes('process'),
+                                    'bg-ctp-surface1 text-ctp-subtext0 ring-1 ring-inset ring-ctp-surface2': !['done','delay','waiting','process'].some(s => (row.status || '').toLowerCase().includes(s))
                                   }"
                 >
                 </span>
@@ -197,16 +272,18 @@
                 </button>
                 <button
                   @click="deleteRow(row.id)"
-                  class="p-2 rounded-lg bg-ctp-red/10 text-ctp-red hover:bg-ctp-red/20 transition"
+                  :disabled="deletingId === row.id"
+                  class="p-2 rounded-lg bg-ctp-red/10 text-ctp-red hover:bg-ctp-red/20 transition disabled:opacity-50"
                 >
-                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  <i x-show="deletingId !== row.id" data-lucide="trash-2" class="w-4 h-4"></i>
+                  <i x-show="deletingId === row.id" data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
                 </button>
               </div>
             </div>
           </div>
         </template>
 
-        <template x-if="rows.length === 0">
+        <template x-if="!loading && rows.length === 0">
           <div
             class="col-span-full py-16 text-center text-ctp-overlay1 border-2 border-dashed border-ctp-surface1 rounded-2xl"
           >
@@ -249,7 +326,7 @@
           <tbody>
             <template x-for="(row, index) in rows" :key="row.id">
               <tr>
-                <td x-text="index + 1" class="text-center"></td>
+                <td x-text="row.id" class="text-center"></td>
                 <td x-text="row.plat"></td>
                 <td x-text="formatDate(row.tgl_berangkat)"></td>
                 <td x-text="row.jam_berangkat"></td>
@@ -298,7 +375,7 @@
                     type="text"
                     required
                     placeholder="B 1234 XX"
-                    class="mt-1 bg-ctp-base border border-ctp-surface1 rounded-lg px-4 py-2.5 text-lg font-mono text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 transition"
+                    class="mt-1 bg-ctp-base border border-ctp-surface1 rounded-lg px-4 py-2.5 text-lg font-mono text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 focus:ring-offset-2 focus:ring-offset-ctp-base transition"
                   />
                 </div>
               </div>
@@ -436,9 +513,11 @@
               </button>
               <button
                 type="submit"
-                class="px-6 py-2.5 rounded-xl font-bold bg-ctp-blue text-ctp-base hover:bg-ctp-sapphire transition shadow-lg shadow-ctp-blue/20"
+                :disabled="isSaving"
+                class="px-6 py-2.5 rounded-xl font-bold bg-ctp-blue text-ctp-base hover:bg-ctp-sapphire transition shadow-lg shadow-ctp-blue/20 flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Save Changes
+                <i x-show="isSaving" data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                <span x-text="isSaving ? 'Menyimpan...' : 'Simpan Changes'"></span>
               </button>
             </div>
           </form>
@@ -446,60 +525,206 @@
       </div>
     </div>
 
+    <!-- History Modal -->
+    <div
+      x-show="historyOpen"
+      class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm transition-opacity"
+      style="display: none"
+      x-transition
+    >
+      <div class="flex min-h-full items-center justify-center p-4 text-center">
+        <div
+          class="bg-ctp-base border border-ctp-surface1 rounded-2xl shadow-2xl w-full max-w-3xl p-6 text-left relative max-h-[80vh] flex flex-col"
+          @click.away="historyOpen = false"
+        >
+          <div class="flex justify-between items-center mb-6 border-b border-ctp-surface1 pb-4">
+            <h2 class="text-2xl font-bold text-ctp-mauve flex items-center gap-2">
+              <i data-lucide="history" class="w-6 h-6"></i>
+              Riwayat / History
+            </h2>
+            <button @click="historyOpen = false" class="text-ctp-overlay0 hover:text-ctp-red transition-colors">
+              <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+          </div>
+
+          <div class="overflow-y-auto flex-1 pr-2">
+            <template x-if="historyLoading">
+              <div class="text-center py-8 text-ctp-subtext0">Loading...</div>
+            </template>
+            <template x-if="!historyLoading && historyRows.length === 0">
+              <div class="text-center py-8 text-ctp-overlay1">Belum ada data arsip.</div>
+            </template>
+
+            <div class="space-y-3">
+              <template x-for="row in historyRows" :key="row.id">
+                <div
+                  class="bg-ctp-surface0 p-4 rounded-xl border border-ctp-surface1 flex justify-between items-center opacity-75 hover:opacity-100 transition"
+                >
+                  <div>
+                    <p class="font-bold text-ctp-text text-lg" x-text="row.plat"></p>
+                    <p class="text-xs text-ctp-subtext0" x-text="formatDate(row.tgl_tiba) + ' ' + row.jam_tiba"></p>
+                  </div>
+                  <div class="text-right">
+                    <span
+                      class="text-sm font-bold block"
+                      :class="{'text-ctp-green': row.status === 'DONE', 'text-ctp-blue': row.status !== 'DONE'}"
+                      x-text="translateStatus(row.status)"
+                    ></span>
+                    <span class="text-xs text-ctp-overlay0 italic" x-text="row.remarks || '-'"></span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+      // --- SUPABASE CONFIG ---
+      const supabaseUrl = "https://jzhguzszgofipqaueubd.supabase.co";
+      const supabaseKey =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6aGd1enN6Z29maXBxYXVldWJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwODY5MjgsImV4cCI6MjA4MzY2MjkyOH0.HVqApwN2-jjvmrNb7_DPabECNUddgCsq2cEqEjAIG9o";
+      const db = supabase.createClient(supabaseUrl, supabaseKey);
+
+      // --- GLOBAL CONSTANTS ---
+      const STATUS_LABELS = {
+        WAITING: "MENUNGGU",
+        PROCESS: "PROSES",
+        DONE: "SELESAI",
+        DELAY: "TERTUNDA",
+      };
+
       document.addEventListener("alpine:init", () => {
         Alpine.data("whiteboard", () => ({
           rows: [],
+          historyRows: [],
           modalOpen: false,
+          historyOpen: false,
+          loading: true,
+          historyLoading: false,
           editMode: false,
+          isSaving: false, // New: For button loading state
+          deletingId: null, // New: Specific row being deleted
+          toasts: [], // New: For notifications
           currentRow: {},
           currentTimestamp: new Date().toLocaleString(),
 
           isDark: JSON.parse(localStorage.getItem("isDark")) ?? true,
 
           init() {
-            // Initialize Lucide Icons
+            // ... existing init ...
             this.$nextTick(() => {
               lucide.createIcons();
             });
-
-            // Re-run icon creation when DOM likely updates
             this.$watch("rows", () => {
               this.$nextTick(() => lucide.createIcons());
             });
-
-            // Watch theme changes
             this.$watch("isDark", (value) => {
               localStorage.setItem("isDark", value);
-              // Re-render icons after theme switch
               this.$nextTick(() => lucide.createIcons());
             });
 
-            // Set initial timestamp
             this.updateTimestamp();
-            // Update timestamp every minute
             setInterval(() => {
               this.updateTimestamp();
             }, 60000);
 
-            // Load from LocalStorage
-            try {
-              const saved = localStorage.getItem("whiteboard_data");
-              if (saved) {
-                this.rows = JSON.parse(saved);
-              } else {
-                throw new Error("No saved data");
-              }
-            } catch (error) {
-              console.warn("Could not load data:", error);
-              // Default Empty
-              this.rows = [];
-            }
+            this.fetchData();
+            // Realtime setup is handled below in methods
+            this.setupRealtime();
           },
 
+          showToast(message, type = "success") {
+            const id = Date.now();
+            this.toasts.push({ id, message, type });
+            setTimeout(() => {
+              this.toasts = this.toasts.filter((t) => t.id !== id);
+            }, 3000); // Auto dismiss
+          },
+
+          // ... fetchData ...
+          async fetchData() {
+            this.loading = true;
+            const { data, error } = await db
+              .from("trucks")
+              .select("*")
+              .eq("is_archived", false)
+              .order("created_at", { ascending: true });
+
+            if (error) {
+              this.showToast("Error loading data: " + error.message, "error");
+            } else {
+              this.rows = data || [];
+            }
+            this.loading = false;
+          },
+
+          // ... (fetchHistory, setupRealtime, updateTimestamp, toggleTheme, formatDate, openModal, editRow, translateStatus, formatPlate same as before) ...
+          async fetchHistory() {
+            this.historyLoading = true;
+            const { data, error } = await db
+              .from("trucks")
+              .select("*")
+              .eq("is_archived", true)
+              .order("created_at", { ascending: false })
+              .limit(50);
+            if (data) this.historyRows = data;
+            this.historyLoading = false;
+          },
+          // ... Skipped boilerplate to focus on changed functions ...
+          setupRealtime() {
+            db.channel("public:trucks")
+              .on("postgres_changes", { event: "*", schema: "public", table: "trucks" }, (payload) => {
+                this.handleRealtimeEvent(payload);
+              })
+              .subscribe();
+          },
+
+          handleRealtimeEvent(payload) {
+            const { eventType, new: newRow, old: oldRow } = payload;
+
+            // 1. INSERT
+            if (eventType === "INSERT") {
+              if (!newRow.is_archived) {
+                // Add if not already present (dedupe)
+                if (!this.rows.find((r) => r.id === newRow.id)) {
+                  this.rows.push(newRow);
+                }
+              }
+            }
+            // 2. UPDATE
+            else if (eventType === "UPDATE") {
+              const idx = this.rows.findIndex((r) => r.id === newRow.id);
+
+              if (newRow.is_archived) {
+                // If it became archived, remove from dashboard
+                if (idx !== -1) this.rows.splice(idx, 1);
+              } else {
+                // Regular update
+                if (idx !== -1) {
+                  this.rows[idx] = newRow;
+                } else {
+                  // It might have been un-archived, so add it
+                  this.rows.push(newRow);
+                }
+              }
+
+              // Also update history if open
+              if (this.historyOpen) this.fetchHistory();
+            }
+            // 3. DELETE
+            else if (eventType === "DELETE") {
+              this.rows = this.rows.filter((r) => r.id !== oldRow.id);
+            }
+
+            // Re-sort to be safe (Created At Ascending for Dashboard)
+            this.rows.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          },
           updateTimestamp() {
             this.currentTimestamp = new Date().toLocaleString("en-US", {
-              timeZone: "Asia/Singapore", // GMT+8
+              timeZone: "Asia/Singapore",
               year: "numeric",
               month: "numeric",
               day: "numeric",
@@ -509,18 +734,15 @@
               hour12: true,
             });
           },
-
           toggleTheme() {
             this.isDark = !this.isDark;
           },
-
           formatDate(isoDate) {
             if (!isoDate) return "-";
             const date = new Date(isoDate);
             if (isNaN(date.getTime())) return isoDate;
             return date.toLocaleDateString("id-ID", { day: "2-digit", month: "short", year: "numeric" });
           },
-
           openModal(rowId = null) {
             this.modalOpen = true;
             if (rowId) {
@@ -528,11 +750,9 @@
               this.currentRow = { ...this.rows.find((r) => r.id === rowId) };
             } else {
               this.editMode = false;
-              // Auto-fill Tiba with current time (GMT+8)
               const now = new Date();
-              const offset = 8 * 60; // GMT+8 in minutes
+              const offset = 8 * 60;
               const localDate = new Date(now.getTime() + (offset + now.getTimezoneOffset()) * 60000);
-
               const yyyy = localDate.getFullYear();
               const mm = String(localDate.getMonth() + 1).padStart(2, "0");
               const dd = String(localDate.getDate()).padStart(2, "0");
@@ -540,7 +760,6 @@
               const min = String(localDate.getMinutes()).padStart(2, "0");
 
               this.currentRow = {
-                id: Date.now(),
                 plat: "",
                 tgl_berangkat: "",
                 jam_berangkat: "",
@@ -553,7 +772,6 @@
               };
             }
           },
-
           editRow(id) {
             const row = this.rows.find((r) => r.id === id);
             if (row) {
@@ -564,68 +782,74 @@
           },
 
           translateStatus(status) {
-            if (!status) return "";
-            const s = status.toUpperCase();
-            if (s === "DONE") return "SELESAI";
-            if (s === "PROCESS") return "PROSES";
-            if (s === "WAITING") return "MENUNGGU";
-            if (s === "DELAY") return "TERTUNDA";
-            return s;
+            return STATUS_LABELS[status?.toUpperCase()] || status || "";
           },
-
           formatPlate(value) {
             if (!value) return "";
             let v = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-            // Try to match standard plate format: Letters Numbers Letters
-            // e.g. B 1234 XX, KT 7878 BVX
-            // Regex: Start, 1-2 letters, 1-4 digits, 0-3 letters, End
             let match = v.match(/^([A-Z]{1,2})(\d{1,4})([A-Z]{0,3})$/);
-            if (match) {
-              // If it looks like a standard plate, add spaces
-              // Only trim if the last part is present, but always space out parts
-              return `${match[1]} ${match[2]} ${match[3]}`.trim();
-            }
-            // Fallback: just uppercase alphanumeric
+            if (match) return `${match[1]} ${match[2]} ${match[3]}`.trim();
             return v;
           },
 
-          saveRow() {
-            // Apply formatting on save
+          async saveRow() {
+            this.isSaving = true;
             this.currentRow.plat = this.formatPlate(this.currentRow.plat);
+            const payload = { ...this.currentRow };
+            Object.keys(payload).forEach((key) => {
+              if (payload[key] === "") payload[key] = null;
+            });
 
+            let error = null;
             if (this.editMode) {
-              const index = this.rows.findIndex((r) => r.id === this.currentRow.id);
-              if (index !== -1) {
-                this.rows[index] = { ...this.currentRow }; // Copy object
-              }
+              const res = await db.from("trucks").update(payload).eq("id", this.currentRow.id);
+              error = res.error;
             } else {
-              this.rows.push({ ...this.currentRow }); // Copy object
+              delete payload.id;
+              const res = await db.from("trucks").insert([payload]);
+              error = res.error;
             }
-            this.saveData(); // Explicit save
-            this.closeModal();
+
+            this.isSaving = false;
+
+            if (error) {
+              this.showToast("Gagal menyimpan: " + error.message, "error");
+            } else {
+              this.showToast(this.editMode ? "Data diperbarui!" : "Kendaraan ditambahkan!", "success");
+              this.closeModal();
+            }
           },
 
-          deleteRow(id) {
+          async deleteRow(id) {
             if (confirm("Anda yakin ingin menghapus baris ini?")) {
-              this.rows = this.rows.filter((r) => r.id !== id);
-              this.saveData(); // Explicit save
+              this.deletingId = id; // Start loading
+              const { error } = await db.from("trucks").delete().eq("id", id);
+
+              this.deletingId = null; // Stop loading
+
+              if (error) {
+                this.showToast("Gagal menghapus: " + error.message, "error");
+              } else {
+                this.showToast("Data dihapus.", "success");
+              }
             }
           },
 
           closeModal() {
             this.modalOpen = false;
             this.currentRow = {};
+            this.isSaving = false;
           },
 
-          clearBoard() {
-            if (confirm("Peringatan: Ini akan menghapus SEMUA data. Apakah anda yakin?")) {
-              this.rows = [];
-              localStorage.removeItem("whiteboard_data");
+          async clearBoard() {
+            if (confirm("Arsipkan Papan? (Data akan dipindah ke History)")) {
+              const { error } = await db.from("trucks").update({ is_archived: true }).eq("is_archived", false);
+              if (error) {
+                this.showToast("Gagal mengarsipkan: " + error.message, "error");
+              } else {
+                this.showToast("Papan berhasil diarsipkan!", "success");
+              }
             }
-          },
-
-          saveData() {
-            localStorage.setItem("whiteboard_data", JSON.stringify(this.rows));
           },
 
           exportBoard() {
