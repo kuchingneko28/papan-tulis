@@ -492,21 +492,8 @@
               }
             } catch (error) {
               console.warn("Could not load data:", error);
-              // Default Dummy Data
-              this.rows = [
-                {
-                  id: 1,
-                  plat: "B 9736 PXR",
-                  tgl_berangkat: "2026-01-08",
-                  jam_berangkat: "17:00",
-                  tgl_tiba: "2026-01-09",
-                  jam_tiba: "18:25",
-                  jam_bongkar: "19:25",
-                  jam_selesai: "20:23",
-                  status: "DONE",
-                  remarks: "Eco",
-                },
-              ];
+              // Default Empty
+              this.rows = [];
             }
           },
 
