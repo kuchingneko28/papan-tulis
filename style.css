@@ -20,66 +20,88 @@
 }
 
 /* Force Header to be Document Style */
+/* Force Header to be Document Style */
 .printing-mode .board-title {
   color: #000000 !important;
-  border-bottom: 3px solid #000000 !important; /* Thicker header line */
+  border-bottom: none !important; /* Removed header line */
   font-size: 2.2rem !important;
   font-weight: 800 !important;
-  margin-bottom: 25px !important; /* Reduced gap */
-  padding-bottom: 10px !important;
   text-align: center !important;
   display: block !important;
   letter-spacing: 0.05em !important;
 }
 
 /* Re-enable Grid for Export */
+/* Re-enable Grid for Export with Rounded look */
+/* Re-enable Grid for Export with Rounded look */
+/* Re-enable Grid for Export with Rounded look */
 .printing-mode .whiteboard-table {
-  border: 2px solid #000000 !important;
+  border: 1px solid #000000 !important; /* Bold Outer Border */
   width: 100% !important;
-  border-collapse: collapse !important;
-  table-layout: fixed !important; /* Ensure consistent column widths if defined, or just stable layout */
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  /* border-radius: 12px !important; */
+  overflow: hidden !important;
+  table-layout: auto !important;
+  margin-bottom: 20px !important;
 }
 
+/* Consistent Header Spacing */
 .printing-mode .whiteboard-table th {
   color: #000000 !important;
-  border: 1px solid #000000 !important;
-  background: #f3f4f6 !important; /* Light gray header */
-  font-weight: 800 !important;
+  border-bottom: 1px solid #000000 !important; /* Bold separator */
+  border-right: 1px solid #d1d5db !important; /* Soft Divider */
+  background: transparent !important;
+  font-weight: 900 !important;
   text-align: center !important;
   text-transform: uppercase !important;
-  padding: 12px 8px !important; /* Balanced padding */
-  font-size: 0.85rem !important;
+  padding: 20px 10px !important;
+  font-size: 0.8rem !important;
   vertical-align: middle !important;
-  line-height: 1.2 !important; /* Tighten line height to prevent top gap */
+  line-height: 1.4 !important;
+  white-space: nowrap !important;
+}
+
+.printing-mode .whiteboard-table th:last-child {
+  border-right: none !important;
 }
 
 .printing-mode .whiteboard-table td {
-  border: 1px solid #000000 !important;
+  border-bottom: 1px solid #d1d5db !important; /* Soft Divider */
+  border-right: 1px solid #d1d5db !important; /* Soft Divider */
   color: #000000 !important;
   font-size: 1rem !important;
-  padding: 12px 10px !important; /* Consistent cell padding */
+  padding: 16px 14px !important;
   vertical-align: middle !important;
-  line-height: 1.4 !important;
+  white-space: nowrap !important;
 }
 
-/* Specific Column Widths (Optional but helps consistency) */
-.printing-mode .whiteboard-table th:nth-child(1) {
-  width: 50px !important;
-} /* NO */
-.printing-mode .whiteboard-table th:nth-child(2) {
-  width: 140px !important;
-} /* PLAT */
-/* Add more if needed, but auto layout usually works for equal grids */
+.printing-mode .whiteboard-table tr:last-child td {
+  border-bottom: none !important; /* Prevent double border at bottom */
+}
 
-/* Reset badges to plain text for export */
+/* Wrap Remarks if they get too long, but keep others tight */
+.printing-mode .whiteboard-table td:last-child {
+  white-space: normal !important;
+  border-right: none !important; /* Prevent double border at right */
+}
+
+/* Removed Specific Column Widths to allow Adaptive Widths */
+/* The browser will now size columns based on the widest content in each column */
+/* .printing-mode .whiteboard-table th:nth-child(1) ... REMOVED */
+
+/* Clean B&W Badges */
 .printing-mode .whiteboard-table td span {
   background: transparent !important;
   color: #000000 !important;
-  padding: 0 !important;
-  border-radius: 0 !important;
-  font-weight: bold !important;
-  display: inline !important;
+  border: none !important; /* Removed Outline */
+  padding: 6px 12px !important;
+  border-radius: 0 !important; /* Plain text */
+  font-weight: 800 !important;
+  display: inline-block !important;
   text-transform: uppercase !important;
+  font-size: 0.7rem !important;
+  box-shadow: none !important; /* Removed Shadow */
 }
 
 /* Hide Actions Column in Print */
@@ -91,12 +113,11 @@
 .printing-mode .timestamp-overlay {
   display: block !important;
   color: #000000 !important;
-  font-size: 1rem !important;
+  font-size: 0.8rem !important;
   font-weight: 600 !important;
-  margin-top: 40px !important;
-  text-align: right !important;
-  border-top: 1px solid #000000 !important; /* Black line for footer */
-  padding-top: 15px !important;
+  text-align: center !important;
+  margin-bottom: 25px !important;
+  padding-bottom: 10px !important;
 }
 
 /* --- GLOBAL THEME VARIABLES & RESETS --- */
