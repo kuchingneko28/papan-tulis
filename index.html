@@ -140,7 +140,8 @@
         </div>
 
         <!-- Secondary Actions (Icon Buttons) -->
-        <div class="flex items-center gap-3">
+        <!-- Desktop Actions (Hidden on Mobile) -->
+        <div class="hidden md:flex items-center gap-3">
           <!-- Theme Toggle -->
           <button
             @click="toggleTheme()"
@@ -176,6 +177,55 @@
             <i data-lucide="trash-2" class="w-5 h-5"></i>
           </button>
         </div>
+
+        <!-- Mobile Menu Button (Visible on Mobile) -->
+        <div class="md:hidden flex items-center gap-2" x-data="{ menuOpen: false }">
+          <button
+            @click="menuOpen = !menuOpen"
+            class="p-2.5 rounded-xl bg-ctp-surface1 text-ctp-text border border-ctp-surface2 transition active:scale-95"
+          >
+            <i :data-lucide="menuOpen ? 'x' : 'menu'" class="w-6 h-6"></i>
+          </button>
+
+          <!-- Mobile Dropdown -->
+          <div
+            x-show="menuOpen"
+            @click.away="menuOpen = false"
+            x-transition
+            class="absolute top-full right-4 mt-2 w-48 bg-ctp-surface0 border border-ctp-surface1 rounded-2xl shadow-2xl p-2 z-50 flex flex-col gap-1"
+            style="display: none"
+          >
+            <button
+              @click="toggleTheme(); menuOpen = false"
+              class="p-3 rounded-xl hover:bg-ctp-surface1 flex items-center gap-3 text-ctp-text text-sm font-bold"
+            >
+              <i :data-lucide="isDark ? 'sun' : 'moon'" class="w-4 h-4"></i>
+              <span x-text="isDark ? 'Light Mode' : 'Dark Mode'"></span>
+            </button>
+            <button
+              @click="historyOpen = true; fetchHistory(); menuOpen = false"
+              class="p-3 rounded-xl hover:bg-ctp-surface1 flex items-center gap-3 text-ctp-text text-sm font-bold"
+            >
+              <i data-lucide="history" class="w-4 h-4 text-ctp-mauve"></i>
+              History
+            </button>
+            <button
+              @click="exportBoard(); menuOpen = false"
+              class="p-3 rounded-xl hover:bg-ctp-surface1 flex items-center gap-3 text-ctp-text text-sm font-bold"
+            >
+              <i data-lucide="camera" class="w-4 h-4 text-ctp-blue"></i>
+              Export JPG
+            </button>
+            <div class="h-px bg-ctp-surface1 mx-2 my-1"></div>
+            <button
+              @click="clearBoard(); menuOpen = false"
+              class="p-3 rounded-xl hover:bg-ctp-red/10 flex items-center gap-3 text-ctp-red text-sm font-bold"
+            >
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+              Clear All
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -201,7 +251,7 @@
                 <!-- integrated Number Badge (Blue Accent) -->
                 <div
                   class="w-10 h-10 rounded-lg bg-ctp-blue/10 text-ctp-blue flex items-center justify-center font-bold font-mono text-sm border border-ctp-blue/20 shadow-inner group-hover:scale-110 group-hover:bg-ctp-blue/20 transition-all duration-300"
-                  x-text="row.id"
+                  x-text="index + 1"
                 ></div>
 
                 <div>
@@ -326,7 +376,7 @@
           <tbody>
             <template x-for="(row, index) in rows" :key="row.id">
               <tr>
-                <td x-text="row.id" class="text-center"></td>
+                <td x-text="index + 1" class="text-center"></td>
                 <td x-text="row.plat"></td>
                 <td x-text="formatDate(row.tgl_berangkat)"></td>
                 <td x-text="row.jam_berangkat"></td>
@@ -375,7 +425,7 @@
                     type="text"
                     required
                     placeholder="B 1234 XX"
-                    class="mt-1 bg-ctp-base border border-ctp-surface1 rounded-lg px-4 py-2.5 text-lg font-mono text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 focus:ring-offset-2 focus:ring-offset-ctp-base transition"
+                    class="mt-1 bg-ctp-base border border-ctp-surface1 rounded-lg px-4 py-2.5 text-base font-mono text-ctp-text w-full focus:outline-none focus:border-ctp-blue focus:ring-2 focus:ring-ctp-blue/20 focus:ring-offset-2 focus:ring-offset-ctp-base transition"
                   />
                 </div>
               </div>
